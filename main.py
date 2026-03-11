@@ -43,20 +43,38 @@ def main():
 
 #main game loop
     while True:
+        #debugging log and a tool for boot.dev to check
         log_state()
+
+        #check if we close the window
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return
+
+        #overrride all draws on the screen by setting it to black and update the state by dt   
         screen.fill("black")
         updatable.update(dt)
+
+        #we check for every asteroid if they collide with the player and also if they collide with a shot
         for asteroid in asteroids:
             if asteroid.collides_with(player):
                 log_event("player_hit")
                 print("Game over!")
                 sys.exit()
+            for shot in shots:
+                if asteroid.collides_with(shot):
+                    log_event("asteroid_shot")
+                    asteroid.split()
+                    shot.kill()
+                    #stop looking for shots hitting an already dead asteroid
+                    break
+        #after checking everything we draw all objects back into the screen with their updated states
         for sprite in drawable:
             sprite.draw(screen)
+
+        #we wait the time needed to draw maximum of 60 fps
         dt = clock.tick(60)/1000
+        #we flip the screen to the frame in buffer
         pygame.display.flip()
 
 
